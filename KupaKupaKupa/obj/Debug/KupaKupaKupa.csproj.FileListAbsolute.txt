@@ -1,0 +1,9 @@
+c:\users\panpiotr\documents\visual studio 2015\Projects\KupaKupaKupa\KupaKupaKupa\bin\Debug\KupaKupaKupa.exe.config
+c:\users\panpiotr\documents\visual studio 2015\Projects\KupaKupaKupa\KupaKupaKupa\bin\Debug\KupaKupaKupa.exe
+c:\users\panpiotr\documents\visual studio 2015\Projects\KupaKupaKupa\KupaKupaKupa\bin\Debug\KupaKupaKupa.pdb
+c:\users\panpiotr\documents\visual studio 2015\Projects\KupaKupaKupa\KupaKupaKupa\obj\Debug\KupaKupaKupa.csprojResolveAssemblyReference.cache
+c:\users\panpiotr\documents\visual studio 2015\Projects\KupaKupaKupa\KupaKupaKupa\obj\Debug\KupaKupaKupa.Form1.resources
+c:\users\panpiotr\documents\visual studio 2015\Projects\KupaKupaKupa\KupaKupaKupa\obj\Debug\KupaKupaKupa.Properties.Resources.resources
+c:\users\panpiotr\documents\visual studio 2015\Projects\KupaKupaKupa\KupaKupaKupa\obj\Debug\KupaKupaKupa.csproj.GenerateResource.Cache
+c:\users\panpiotr\documents\visual studio 2015\Projects\KupaKupaKupa\KupaKupaKupa\obj\Debug\KupaKupaKupa.exe
+c:\users\panpiotr\documents\visual studio 2015\Projects\KupaKupaKupa\KupaKupaKupa\obj\Debug\KupaKupaKupa.pdb
