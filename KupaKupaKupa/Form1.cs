@@ -11,6 +11,73 @@ using System.Windows.Forms;
 namespace KupaKupaKupa
 {
 
+    public class Duszek
+    {
+        
+        public Duszek(int x, int y)
+        {
+            bb = new Rectangle(x, y, 50, 50);
+
+            var random = new Random();
+
+            vX = random.Next(-5, 5);
+            vX = Math.Abs(vX) == 0 ? 1 : vX;
+
+
+            vY = random.Next(-5, 5);
+            vY = Math.Abs(vY) == 0 ? 1 : vY;
+        }
+
+        public void DrawMe(Graphics g)
+        {
+            
+            g.DrawPie(Pens.Black, bb, deg+(vX < 0 ? -180: 0), -deg*2+360);
+        }
+
+        public void ProcessMe()
+        {
+            deg += 5f;
+            if (deg > 60)
+                deg = 0;
+            bb.Location = new Point(bb.Location.X + vX, bb.Location.Y + vY);
+        }
+
+        public void CollideWith(Duszek innyDuszek)
+        {
+            if (innyDuszek == this)
+                return;
+            var boundaries = innyDuszek.bb;
+            if (!bb.IntersectsWith(boundaries))
+                return;
+
+            int mX = (bb.Top > boundaries.Top) ? 1 : -1;
+            int mY = (bb.Left > boundaries.Left) ? 1 : -1;
+
+            vX = Math.Abs(vX) * mX;
+            vY = Math.Abs(vY) * mY;
+        }
+
+        public void CollideWith(Rectangle boundaries)
+        {
+            if (boundaries.Right < bb.Right)
+                vX = -1 * Math.Abs(vX);
+            if (boundaries.Left > bb.Left)
+                vX = Math.Abs(vX);
+            if (boundaries.Top > bb.Top)
+                vY = Math.Abs(vY);
+            if (boundaries.Bottom < bb.Bottom)
+                vY = -1 * Math.Abs(vY);
+        }
+
+        Rectangle bb;
+        
+        int vX;
+        int vY;
+        float deg = 0;
+    }
+
+
+
     public partial class Form1 : Form
     {
         //????
@@ -23,62 +90,73 @@ namespace KupaKupaKupa
                 return cp;
             }
         }
-        private bool toKupaOrNotToKupa = false;
         Bitmap bitmap;
+        List<Duszek> duszki;
+
+        Bitmap skewXBitmap(Bitmap bitmap, double skew)
+        {
+            
+            double width = bitmap.Width + skew * bitmap.Height;
+            int iWidth = (int)width;
+            var retBitmap = new Bitmap(iWidth, bitmap.Height);
+
+
+            for (int i = 0; i < bitmap.Height; ++i)
+            {
+                int j0 = (int)((bitmap.Height - i) * skew);
+                for (int j = j0; j < j0 + bitmap.Width; ++j)
+                {
+                    int nJ = j - (int)((bitmap.Height - i) * skew);
+                    nJ = Math.Min(nJ, bitmap.Width - 1);
+                    retBitmap.SetPixel(j, i, bitmap.GetPixel(nJ, i));
+                }
+            }
+            return retBitmap;
+        }
+
+        Bitmap skewYBitmap(Bitmap bitmap, double skew)
+        {
+
+            var rotatedBitmap = new Bitmap(bitmap);
+            rotatedBitmap.RotateFlip(RotateFlipType.Rotate90FlipNone);
+            var ret = skewXBitmap(rotatedBitmap, skew);
+            ret.RotateFlip(RotateFlipType.Rotate270FlipNone);
+            return ret;
+        }
+
         public Form1()
         {
-            bitmap = new Bitmap(elipseWidth+10, elipseHeight+10);
+            SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+            duszki = new List<Duszek>();
+            duszki.Add(new KupaKupaKupa.Duszek(100, 100));
+            duszki.Add(new KupaKupaKupa.Duszek(500, 500));
+            duszki.Add(new KupaKupaKupa.Duszek(300, 300));
+
+            
+
+            //var image = Image.FromFile("shrek.jpg");
+            //var imageBitmap = new Bitmap(image);
+            //bitmap = skewYBitmap(imageBitmap, 1.5);
+            //bitmap = skewXBitmap(bitmap, 2.0);
             InitializeComponent();
         }
 
         int dX = 15;
         int dY = 11;
-        int x = 0;
-        int y = 0;
-        int elipseWidth = 60;
-        int elipseHeight = 12;
         private void timer1_Tick(object sender, EventArgs e)
         {
-            x += dX;
-            y += dY;
 
-            if (dX > 0)
+            foreach (var duszek in duszki)
             {
-                if (ClientRectangle.Width - elipseWidth < x+dX/2)
+                duszek.ProcessMe();
+                foreach (var innyDuszek in duszki)
                 {
-                    dX = -dX;
+                    duszek.CollideWith(innyDuszek);
                 }
+                duszek.CollideWith(ClientRectangle);
             }
-            else
-            {
-                if (x < dX/2)
-                {
-                    dX = -dX;
-                }
-            }
-
-            if (dY > 0)
-            {
-                if (ClientRectangle.Height - elipseHeight < y+dY/2)
-                {
-                    dY = -dY;
-                }
-            }
-            else
-            {
-                if (y < dY/2)
-                {
-                    dY = -dY;
-                }
-            }
-
+            SuspendLayout();
             Invalidate();
-            using (Graphics g = Graphics.FromImage(bitmap))
-            {
-                g.DrawEllipse(Pens.Black, 0, 0, elipseWidth, elipseHeight);
-            }
-            
-            
         }
 
 
@@ -90,47 +168,25 @@ namespace KupaKupaKupa
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
+            var g = e.Graphics;
+            {
+                foreach (var duszek in duszki)
+                {
+                    duszek.DrawMe(g);
+                }
+            }
+            ResumeLayout();
             //e.Graphics.DrawEllipse(Pens.Black, x, y, elipseWidth, elipseHeight);
-            e.Graphics.DrawImage(bitmap, x, y);
         }
 
         private void Form1_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
-            switch (e.KeyCode)
-            {
-                case Keys.Right:
-                case Keys.Left:
-                case Keys.Up:
-                case Keys.Down:
-                    e.IsInputKey = true;
-                    break;
-                case Keys.Shift | Keys.Right:
-                case Keys.Shift | Keys.Left:
-                case Keys.Shift | Keys.Up:
-                case Keys.Shift | Keys.Down: 
-                    e.IsInputKey = true;
-                    break;
-            }
    
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
-            switch (e.KeyCode)
-            {
-                case Keys.Left:
-                    dX -= 1;
-                    break;
-                case Keys.Right:
-                    dX += 1;
-                    break;
-                case Keys.Up:
-                    dY -= 1;
-                    break;
-                case Keys.Down:
-                    dY += 1;
-                    break;
-            }
+
         }
     }
 }
