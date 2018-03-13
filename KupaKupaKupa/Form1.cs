@@ -46,15 +46,27 @@ namespace KupaKupaKupa
         {
             if (innyDuszek == this)
                 return;
+
+            var ovX = innyDuszek.vX;
+            var ovY = innyDuszek.vY;
+
             var boundaries = innyDuszek.bb;
-            if (!bb.IntersectsWith(boundaries))
+
+            var diffLocation = new Point(bb.X - innyDuszek.bb.X, bb.Y - innyDuszek.bb.Y);
+
+            var distanceSquared = diffLocation.X * diffLocation.X + diffLocation.Y * diffLocation.Y;
+
+            if (distanceSquared > 25*25)
                 return;
 
-            int mX = (bb.Top > boundaries.Top) ? 1 : -1;
-            int mY = (bb.Left > boundaries.Left) ? 1 : -1;
+            vX *= -1;
+            vY *= -1;
 
-            vX = Math.Abs(vX) * mX;
-            vY = Math.Abs(vY) * mY;
+            innyDuszek.vX *= -1;
+            innyDuszek.vY *= -1;
+
+            ProcessMe();
+            innyDuszek.ProcessMe();
         }
 
         public void CollideWith(Rectangle boundaries)
