@@ -56,7 +56,7 @@ namespace KupaKupaKupa
 
             var distanceSquared = diffLocation.X * diffLocation.X + diffLocation.Y * diffLocation.Y;
 
-            if (distanceSquared > 25*25)
+            if (distanceSquared > 50*50)
                 return;
 
             vX *= -1;
