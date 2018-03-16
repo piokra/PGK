@@ -10,6 +10,30 @@ using System.Windows.Forms;
 
 namespace KupaKupaKupa
 {
+    public class BG
+    {
+        Bitmap bitmap = new Bitmap("shrek.jpg");
+        int dx = 0, dy = 0;
+        Rectangle rc;
+        public BG(Rectangle clientRectangle)
+        {
+            rc = clientRectangle;
+        }
+
+        public void DrawMe(Graphics g)
+        {
+            g.DrawImage(bitmap, 0, 0, new Rectangle(dx, dy, 500, 500), GraphicsUnit.Pixel);
+        }
+        public void MoveMe(int dx, int dy)
+        {
+            this.dx += dx;
+            dx %= bitmap.Width;
+
+            this.dy += dy;
+            dy %= bitmap.Height;
+        }
+
+    }
 
     public class Duszek
     {
@@ -56,7 +80,8 @@ namespace KupaKupaKupa
 
             var distanceSquared = diffLocation.X * diffLocation.X + diffLocation.Y * diffLocation.Y;
 
-            if (distanceSquared > 50*50)
+            var r2 = innyDuszek.r + r;
+            if (distanceSquared > r2*r2)
                 return;
 
             vX *= -1;
@@ -85,6 +110,7 @@ namespace KupaKupaKupa
         
         int vX;
         int vY;
+        int r = 25;
         float deg = 0;
     }
 
@@ -135,9 +161,11 @@ namespace KupaKupaKupa
             ret.RotateFlip(RotateFlipType.Rotate270FlipNone);
             return ret;
         }
-
+        BG bg;
         public Form1()
         {
+            bg = new KupaKupaKupa.BG(ClientRectangle);
+            MouseMove += Form1_MouseMove;
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             duszki = new List<Duszek>();
             duszki.Add(new KupaKupaKupa.Duszek(100, 100));
@@ -151,6 +179,16 @@ namespace KupaKupaKupa
             //bitmap = skewYBitmap(imageBitmap, 1.5);
             //bitmap = skewXBitmap(bitmap, 2.0);
             InitializeComponent();
+        }
+
+        private Point previous = new Point(0, 0);
+        private void Form1_MouseMove(object sender, MouseEventArgs e)
+        {
+            Point current = new Point(e.X, e.Y);
+            int dx = previous.X - current.X, dy = previous.Y - current.Y;
+            bg.MoveMe(-dx, -dy);
+            previous = current;
+            
         }
 
         int dX = 15;
@@ -180,7 +218,9 @@ namespace KupaKupaKupa
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
+            
             var g = e.Graphics;
+            bg.DrawMe(e.Graphics);
             {
                 foreach (var duszek in duszki)
                 {

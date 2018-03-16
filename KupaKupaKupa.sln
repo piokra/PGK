@@ -5,6 +5,12 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KupaKupaKupa", "KupaKupaKupa\KupaKupaKupa.csproj", "{4148A2A0-462A-46F1-9100-970C5C8BEC3C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E63D693E-B10A-4CB9-A7D2-F390967BE801}"
+	ProjectSection(SolutionItems) = preProject
+		KupaKupaKupa\giphy.gif = KupaKupaKupa\giphy.gif
+		KupaKupaKupa\shrek.jpg = KupaKupaKupa\shrek.jpg
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

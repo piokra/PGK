@@ -6,4 +6,4 @@ c:\users\panpiotr\documents\visual studio 2015\Projects\KupaKupaKupa\KupaKupaKup
 c:\users\panpiotr\documents\visual studio 2015\Projects\KupaKupaKupa\KupaKupaKupa\obj\Debug\KupaKupaKupa.csproj.GenerateResource.Cache
 c:\users\panpiotr\documents\visual studio 2015\Projects\KupaKupaKupa\KupaKupaKupa\obj\Debug\KupaKupaKupa.exe
 c:\users\panpiotr\documents\visual studio 2015\Projects\KupaKupaKupa\KupaKupaKupa\obj\Debug\KupaKupaKupa.pdb
-C:\Users\PanPiotr\documents\visual studio 2015\Projects\KupaKupaKupa\KupaKupaKupa\obj\Debug\KupaKupaKupa.Duszek.resources
+C:\Users\PanPiotr\documents\visual studio 2015\Projects\KupaKupaKupa\KupaKupaKupa\obj\Debug\KupaKupaKupa.BG.resources
