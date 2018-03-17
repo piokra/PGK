@@ -22,13 +22,15 @@ namespace KupaKupaKupa
 
         public void DrawMe(Graphics g)
         {
-            g.DrawImage(bitmap, 0, 0, new Rectangle(dx, dy, 500, 500), GraphicsUnit.Pixel);
+            g.DrawImage(bitmap, 0, 0, new Rectangle(dx, dy, bitmap.Width-dx, bitmap.Height-dy), GraphicsUnit.Pixel);
+            g.DrawImage(bitmap, bitmap.Width-dx, 0, new Rectangle(0, dy, bitmap.Width, bitmap.Height), GraphicsUnit.Pixel);
         }
         public void MoveMe(int dx, int dy)
         {
             this.dx += dx;
             dx %= bitmap.Width;
 
+            MessageBox.Show(this.dx.ToString());
             this.dy += dy;
             dy %= bitmap.Height;
         }
@@ -124,7 +126,7 @@ namespace KupaKupaKupa
             get
             {
                 CreateParams cp = base.CreateParams;
-                cp.ExStyle |= 0x02000000;  // Turn on WS_EX_COMPOSITED
+                //cp.ExStyle |= 0x02000000;  // Turn on WS_EX_COMPOSITED
                 return cp;
             }
         }
@@ -164,6 +166,7 @@ namespace KupaKupaKupa
         BG bg;
         public Form1()
         {
+            bitmap = new Bitmap(1000, 1000);
             bg = new KupaKupaKupa.BG(ClientRectangle);
             MouseMove += Form1_MouseMove;
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
@@ -205,8 +208,23 @@ namespace KupaKupaKupa
                 }
                 duszek.CollideWith(ClientRectangle);
             }
+
+            using (Graphics g = Graphics.FromImage(bitmap))
+            {
+                g.Clear(Color.White);
+                bg.DrawMe(g);
+                foreach (var duszek in duszki)
+                {
+                    duszek.DrawMe(g);
+                }
+            }
+
+            using (Graphics g = CreateGraphics())
+            {
+                g.DrawImage(bitmap, 0, 0);
+            }
             SuspendLayout();
-            Invalidate();
+            
         }
 
 
@@ -219,15 +237,7 @@ namespace KupaKupaKupa
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
             
-            var g = e.Graphics;
-            bg.DrawMe(e.Graphics);
-            {
-                foreach (var duszek in duszki)
-                {
-                    duszek.DrawMe(g);
-                }
-            }
-            ResumeLayout();
+            
             //e.Graphics.DrawEllipse(Pens.Black, x, y, elipseWidth, elipseHeight);
         }
 
