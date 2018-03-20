@@ -22,17 +22,16 @@ namespace KupaKupaKupa
 
         public void DrawMe(Graphics g)
         {
-            g.DrawImage(bitmap, 0, 0, new Rectangle(dx, dy, bitmap.Width-dx, bitmap.Height-dy), GraphicsUnit.Pixel);
+            g.DrawImage(bitmap, 0, 0, new Rectangle(dx, dy, bitmap.Width, bitmap.Height), GraphicsUnit.Pixel);
             g.DrawImage(bitmap, bitmap.Width-dx, 0, new Rectangle(0, dy, bitmap.Width, bitmap.Height), GraphicsUnit.Pixel);
         }
         public void MoveMe(int dx, int dy)
         {
-            this.dx += dx;
-            dx %= bitmap.Width;
+            this.dx += dx + bitmap.Width;
+            this.dx %= bitmap.Width;
 
-            MessageBox.Show(this.dx.ToString());
-            this.dy += dy;
-            dy %= bitmap.Height;
+            this.dy += dy + bitmap.Height;
+            this.dy %= bitmap.Height;
         }
 
     }
@@ -43,6 +42,13 @@ namespace KupaKupaKupa
         public Duszek(int x, int y)
         {
             bb = new Rectangle(x, y, 50, 50);
+
+            convex2D = Convex2D.ApproxCircle(7, 25);
+            convex2D.origin = new Vector2
+            {
+                X = x - 25,
+                Y = y - 25,
+            };
 
             var random = new Random();
 
@@ -58,6 +64,7 @@ namespace KupaKupaKupa
         {
             
             g.DrawPie(Pens.Black, bb, deg+(vX < 0 ? -180: 0), -deg*2+360);
+            convex2D.DrawMe(g);
         }
 
         public void ProcessMe()
@@ -66,6 +73,7 @@ namespace KupaKupaKupa
             if (deg > 60)
                 deg = 0;
             bb.Location = new Point(bb.Location.X + vX, bb.Location.Y + vY);
+            convex2D.origin = new Vector2(bb.Location.X + 25, bb.Location.Y + 25);
         }
 
         public void CollideWith(Duszek innyDuszek)
@@ -73,17 +81,20 @@ namespace KupaKupaKupa
             if (innyDuszek == this)
                 return;
 
-            var ovX = innyDuszek.vX;
-            var ovY = innyDuszek.vY;
+            //var ovX = innyDuszek.vX;
+            //var ovY = innyDuszek.vY;
 
-            var boundaries = innyDuszek.bb;
+            //var boundaries = innyDuszek.bb;
 
-            var diffLocation = new Point(bb.X - innyDuszek.bb.X, bb.Y - innyDuszek.bb.Y);
+            //var diffLocation = new Point(bb.X - innyDuszek.bb.X, bb.Y - innyDuszek.bb.Y);
 
-            var distanceSquared = diffLocation.X * diffLocation.X + diffLocation.Y * diffLocation.Y;
+            //var distanceSquared = diffLocation.X * diffLocation.X + diffLocation.Y * diffLocation.Y;
 
-            var r2 = innyDuszek.r + r;
-            if (distanceSquared > r2*r2)
+            //var r2 = innyDuszek.r + r;
+            //if (distanceSquared > r2*r2)
+            //    return;
+
+            if (!innyDuszek.convex2D.collides(convex2D))
                 return;
 
             vX *= -1;
@@ -109,6 +120,7 @@ namespace KupaKupaKupa
         }
 
         Rectangle bb;
+        Convex2D convex2D;
         
         int vX;
         int vY;
@@ -213,6 +225,7 @@ namespace KupaKupaKupa
             {
                 g.Clear(Color.White);
                 bg.DrawMe(g);
+
                 foreach (var duszek in duszki)
                 {
                     duszek.DrawMe(g);
