@@ -46,6 +46,21 @@ namespace KupaKupaKupa
             return castedPoint - castedOrigin;
         }
 
+        public float maxPenetration(Vector2[] points)
+        {
+            float maxPen = float.PositiveInfinity;
+           
+            foreach (Vector2 point in points)
+            {
+                float pen = penetration(point);
+                if (pen < maxPen)
+                {
+                    maxPen = pen;
+                }
+            }
+            return maxPen;
+        }
+
         public void DrawMe(Graphics g)
         {
             var other = origin + 30*normal;

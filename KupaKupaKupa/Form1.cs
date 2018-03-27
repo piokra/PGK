@@ -52,18 +52,21 @@ namespace KupaKupaKupa
 
             var random = new Random();
 
-            vX = random.Next(-5, 5);
+            vX = random.Next(-9, 9);
             vX = Math.Abs(vX) == 0 ? 1 : vX;
 
 
-            vY = random.Next(-5, 5);
+            vY = random.Next(-9, 9);
             vY = Math.Abs(vY) == 0 ? 1 : vY;
+
+            v = new Vector2(vX, vY);
         }
 
         public void DrawMe(Graphics g)
         {
             
             g.DrawPie(Pens.Black, bb, deg+(vX < 0 ? -180: 0), -deg*2+360);
+            g.DrawLine(Pens.Purple, bb.Location.X + 25, bb.Location.Y + 25, bb.Location.X + 25 + 10*v.X, bb.Location.Y + 25 + 10*v.Y);
             convex2D.DrawMe(g);
         }
 
@@ -81,47 +84,66 @@ namespace KupaKupaKupa
             if (innyDuszek == this)
                 return;
 
-            //var ovX = innyDuszek.vX;
-            //var ovY = innyDuszek.vY;
-
-            //var boundaries = innyDuszek.bb;
-
-            //var diffLocation = new Point(bb.X - innyDuszek.bb.X, bb.Y - innyDuszek.bb.Y);
-
-            //var distanceSquared = diffLocation.X * diffLocation.X + diffLocation.Y * diffLocation.Y;
-
-            //var r2 = innyDuszek.r + r;
-            //if (distanceSquared > r2*r2)
-            //    return;
-
-            if (!innyDuszek.convex2D.collides(convex2D))
+            Plane plane = innyDuszek.convex2D.maxPenPlane(convex2D);
+            
+            if (plane == null)
                 return;
 
-            vX *= -1;
-            vY *= -1;
+            Vector2 normal = plane.normal;
+            Vector2 mnormal = -plane.normal;
+            if (normal * v > 0 && normal * innyDuszek.v < 0)
+                return;            
+            float dvn = v * normal;
+            float dovn = innyDuszek.v * normal;
 
-            innyDuszek.vX *= -1;
-            innyDuszek.vY *= -1;
+            v = v - 2 * dvn * normal;
+            innyDuszek.v = innyDuszek.v - 2 * dovn * normal; 
+            
+            vX = (int)v.X;
+            vY = (int)v.Y;
 
+            innyDuszek.vX = (int)innyDuszek.v.X;
+            innyDuszek.vY = (int)innyDuszek.v.Y;
+
+            bb.Location = new Point(bb.X + (int)(10*normal.X), bb.Y + (int)(10*normal.Y));
             ProcessMe();
             innyDuszek.ProcessMe();
+        }
+
+        public float CEnergy()
+        {
+            return v.length() * v.length();
         }
 
         public void CollideWith(Rectangle boundaries)
         {
             if (boundaries.Right < bb.Right)
+            {
                 vX = -1 * Math.Abs(vX);
+                v.X = -1 * Math.Abs(v.X);
+            }
             if (boundaries.Left > bb.Left)
+            {
                 vX = Math.Abs(vX);
+                v.X = Math.Abs(v.X);
+            }
             if (boundaries.Top > bb.Top)
+            {
                 vY = Math.Abs(vY);
+                v.Y = Math.Abs(v.Y);
+            }
             if (boundaries.Bottom < bb.Bottom)
+            {
                 vY = -1 * Math.Abs(vY);
-        }
+                v.Y = -1 * Math.Abs(v.Y);
+            }
+       }
 
         Rectangle bb;
         Convex2D convex2D;
-        
+
+        public Vector2 V { get { return v; } }
+        Vector2 v;
         int vX;
         int vY;
         int r = 25;
@@ -186,8 +208,10 @@ namespace KupaKupaKupa
             duszki.Add(new KupaKupaKupa.Duszek(100, 100));
             duszki.Add(new KupaKupaKupa.Duszek(500, 500));
             duszki.Add(new KupaKupaKupa.Duszek(300, 300));
+            duszki.Add(new KupaKupaKupa.Duszek(500, 300));
+            duszki.Add(new KupaKupaKupa.Duszek(300, 500));
 
-            
+
 
             //var image = Image.FromFile("shrek.jpg");
             //var imageBitmap = new Bitmap(image);
@@ -210,10 +234,13 @@ namespace KupaKupaKupa
         int dY = 11;
         private void timer1_Tick(object sender, EventArgs e)
         {
-
+            float totalEnergy = 0;
+            Vector2 momentum = new Vector2();
             foreach (var duszek in duszki)
             {
                 duszek.ProcessMe();
+                totalEnergy += duszek.CEnergy();
+                momentum += duszek.V;
                 foreach (var innyDuszek in duszki)
                 {
                     duszek.CollideWith(innyDuszek);
@@ -230,6 +257,10 @@ namespace KupaKupaKupa
                 {
                     duszek.DrawMe(g);
                 }
+                var font = new Font("Times New Roman", 12.0f);
+                g.DrawString(totalEnergy.ToString(), font, Brushes.Red, new PointF(10, 10));
+
+                g.DrawString(momentum.ToString(), font, Brushes.Red, new PointF(10, 30));
             }
 
             using (Graphics g = CreateGraphics())

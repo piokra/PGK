@@ -68,6 +68,35 @@ namespace KupaKupaKupa
             
         }
 
+        public Plane maxPenPlane(Convex2D other)
+        {
+            foreach (Vector2 point in points)
+            {
+                bool failed = false;
+                float maxPen = 0;
+                Plane maxPlane = null;
+                foreach (Plane plane in other.planes)
+                {
+                    float penetration = plane.penetration(point + origin);
+                    if (penetration > 0)
+                    {
+                        failed = true;
+                        break;
+                    }
+                    if (maxPen > penetration)
+                    {
+                        maxPen = penetration;
+                        maxPlane = plane;
+                    }
+                }
+                if (!failed)
+                {
+                    return maxPlane;
+                }
+            }
+            return null;
+        }
+
         public static Convex2D ApproxCircle(int pointsCount, float radius)
         {
             List<Vector2> pointsList = new List<Vector2>();

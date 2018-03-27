@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace KupaKupaKupa
 {
-    class Vector2
+    public class Vector2
     {
         public float X { get; set; }
         public float Y { get; set; }
@@ -87,6 +87,11 @@ namespace KupaKupaKupa
         public float length()
         {
             return (float)Math.Sqrt(X*X+Y*Y);
+        }
+
+        public override string ToString()
+        {
+            return X.ToString() + " " + Y.ToString();
         }
 
     }
