@@ -37,6 +37,45 @@ float qW = 0;
 int screenW = 320, screenH = 320;
 bool doRotation = false;
 
+float lightTime = 0;
+float light1Pos[4] = {0,0,0,1}, light2Pos[4] = {0,0,0,1}, light3Pos[4] = {0,0,0,1};
+float red[4] = {1,0,0,1}, green[4] = {0,1,0,1}, blue[4] = {0,0,1,1};
+
+
+void drawOneLightObject(float* where) {
+    glPushMatrix();
+    glTranslatef(where[0], where[1], where[2]);
+    glutSolidCube(0.1);
+    glPopMatrix();
+}
+
+void refreshLightPos() {
+    lightTime += 0.01;
+    light1Pos[0] = 10*cos(lightTime);
+    light1Pos[1] = 10*sin(lightTime);
+    light1Pos[2] = 10*sin(cubeTheta);
+
+    light2Pos[0] = 10*sin(lightTime);
+    light2Pos[1] = 10*sin(cubeTheta);
+    light2Pos[2] = 10*cos(lightTime);
+
+    light3Pos[0] = 10*sin(cubeTheta);
+    light3Pos[1] = 10*cos(lightTime);
+    light3Pos[2] = 10*sin(lightTime);
+}
+
+void drawLightObjects() {
+
+    drawOneLightObject(light1Pos);
+    drawOneLightObject(light2Pos);
+    drawOneLightObject(light3Pos);
+
+    glLightfv(GL_LIGHT1, GL_POSITION, light1Pos);
+    glLightfv(GL_LIGHT2, GL_POSITION, light2Pos);
+    glLightfv(GL_LIGHT3, GL_POSITION, light3Pos);
+
+}
+
 void randomColor() {
     float r = rand() % 255, g = rand() % 255, b = rand() % 255;
     r /= 255;
@@ -146,6 +185,7 @@ void computeDir(float deltaAngle, float deltaTheta) {
 
 void renderScene(void) {
     srand(0);
+    refreshLightPos();
     if (deltaMove)
         computePos(deltaMove);
     if (deltaAngle || deltaTheta)
@@ -172,6 +212,7 @@ void renderScene(void) {
               x + lx, 1.0f, z + lz,
               ux, uy, 0);
 
+    drawLightObjects();
     cube(cubePhi, cubeTheta);
     glTranslatef(1, 1, 0);
     float xx = mX - screenW / 2, yy = mY - screenH / 2;
@@ -295,7 +336,19 @@ int main(int argc, char **argv) {
     glutMotionFunc(mouseMotion);
     // OpenGL init
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT1);
+    glEnable(GL_LIGHT2);
+    glEnable(GL_LIGHT3);
 
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, red);
+    glLightfv(GL_LIGHT2, GL_DIFFUSE, green);
+    glLightfv(GL_LIGHT3, GL_DIFFUSE, blue);
+
+    glLightfv(GL_LIGHT1, GL_SPECULAR, red);
+    glLightfv(GL_LIGHT2, GL_SPECULAR, green);
+    glLightfv(GL_LIGHT3, GL_SPECULAR, blue);
     // enter GLUT event processing cycle
     glutMainLoop();
 
