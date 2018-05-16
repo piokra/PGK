@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <math.h>
-
+#include <png.h>
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
@@ -8,7 +8,12 @@
 #include <GL/glut.h>
 #include <iostream>
 
+#include "textura1.c"
+#include "textura2.c"
+
 #endif
+
+GLuint textures[2];
 
 // angle of rotation for the camera direction
 float angle = 0.0f;
@@ -84,17 +89,44 @@ void randomColor() {
     glColor3f(r, g, b);
 }
 
-void cubeHelper() {
+void cubeHelper(int face) {
     glBegin(GL_QUADS);
-    randomColor();
+    //randomColor();
+    float h = 1./6.;
+
+    glNormal3f(-0.1,-0.1,0.8);
+    glTexCoord2d(face*h, 0);
     glVertex3f(-0.5f, -0.5f, 0.5f);
+
+    glNormal3f(0.1,-0.1,0.8);
+    glTexCoord2d((face+1)*h, 0);
+
+    glNormal3f(0.1,0.1,0.8);
     glVertex3f(0.5f, -0.5f, 0.5f);
+    glTexCoord2d((face+1)*h, 1);
+
+    glNormal3f(-0.1,0.1,0.8);
     glVertex3f(0.5f, 0.5f, 0.5f);
+    glTexCoord2d((face)*h, 1);
     glVertex3f(-0.5f, 0.5f, 0.5f);
-    randomColor();
+
+    ++face;
+    //randomColor();
+    glNormal3f(0.1,0.1,-0.8);
+    glTexCoord2d(face*h, 0);
     glVertex3f(-0.5f, -0.5f, -0.5f);
+
+    glNormal3f(-0.1,0.1,-0.8);
+    glTexCoord2d((face+1)*h, 0);
     glVertex3f(0.5f, -0.5f, -0.5f);
+
+    glNormal3f(-0.1,-0.1,-0.8);
+    glTexCoord2d((face+1)*h, 1);
     glVertex3f(0.5f, 0.5f, -0.5f);
+
+
+    glNormal3f(0.1,-0.1,-0.8);
+    glTexCoord2d((face)*h, 0);
     glVertex3f(-0.5f, 0.5f, -0.5f);
     glEnd();
 }
@@ -103,15 +135,15 @@ void cube(float theta, float phi) {
     glPushMatrix();
     glRotatef(phi, 1, 0, 0);
     glRotatef(theta, 0, 1, 0);
-
-    cubeHelper();
+    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    cubeHelper(0);
     glPushMatrix();
     glRotatef(90, 0, 1, 0);
-    cubeHelper();
+    cubeHelper(2);
     glPopMatrix();
     glPushMatrix();
     glRotatef(90, 1, 0, 0);
-    cubeHelper();
+    cubeHelper(4);
     glPopMatrix();
 
 
@@ -341,6 +373,8 @@ int main(int argc, char **argv) {
     glEnable(GL_LIGHT1);
     glEnable(GL_LIGHT2);
     glEnable(GL_LIGHT3);
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_RESCALE_NORMAL);
 
     glLightfv(GL_LIGHT1, GL_DIFFUSE, red);
     glLightfv(GL_LIGHT2, GL_DIFFUSE, green);
@@ -349,6 +383,20 @@ int main(int argc, char **argv) {
     glLightfv(GL_LIGHT1, GL_SPECULAR, red);
     glLightfv(GL_LIGHT2, GL_SPECULAR, green);
     glLightfv(GL_LIGHT3, GL_SPECULAR, blue);
+
+    glGenTextures(2, textures);
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, tex2.bytes_per_pixel, tex1.width, tex1.height, 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, tex1.pixel_data);
+
+
+    glBindTexture(GL_TEXTURE_2D, textures[1]);
+    glTexImage2D(GL_TEXTURE_2D, 0, tex2.bytes_per_pixel, tex2.width, tex2.height, 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, tex2.pixel_data);
+
     // enter GLUT event processing cycle
     glutMainLoop();
 
